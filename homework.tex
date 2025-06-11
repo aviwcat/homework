@@ -1,0 +1,80 @@
+% Lightweight LaTeX command library for homework documents
+
+\usepackage{fancyhdr}
+\usepackage[most]{tcolorbox}
+\usepackage{lastpage}
+\usepackage{geometry} %% for page margins
+\usepackage{xparse} %% for custom command
+\usepackage{pgfkeys} %% ^^
+\usepackage{etoolbox} %% ^^
+
+\geometry{
+	paper=a4paper,
+    top=3cm,
+    bottom=3cm,
+	left=2.5cm,
+	right=2.5cm,
+	headheight=14pt,
+	footskip=1.4cm,
+	headsep=1.2cm,
+}
+
+% Define keys
+\pgfkeys{
+  /mycmd/.is family, /mycmd,
+  default/.style = {
+    name=,
+    id=,
+    course=,
+    title=,
+    due=,
+    date=,
+    answerborder=darkgray!11
+  },
+  name/.estore in = \hwname,
+  id/.estore in = \hwid,
+  course/.estore in = \hwcourse,
+  title/.estore in = \hwtitle,
+  due/.estore in = \hwdue,
+  date/.estore in = \hwdate,
+  answerborder/.estore in = \hwanswerborder
+}
+
+
+% Define command with keyword arguments
+\NewDocumentCommand{\setup}{m}{%
+  \pgfkeys{/mycmd, default, #1}%
+  \title{\hwcourse\ \hwtitle}
+  \author{\ifdefempty{\hwname}{}{\hwname\\}\ifdefempty{\hwid}{}{\hwid}}
+%   \date{\small\hwdate\\Due: \hwdue}
+  \date{\small\ifdefempty{\hwdate}{}{\hwdate\\}\ifdefempty{\hwdue}{}{Due: \hwdue}}
+  \maketitle
+  \thispagestyle{fancy}
+}
+
+
+\pagestyle{fancy}
+
+% Customize header and footer
+\fancyhf{} % Clear all header and footer fields
+
+% Header & Footer — customize these values as needed
+\fancyhead[R]{\hwname\ifdefempty{\hwid}{}{\ \hwid}}
+\fancyhead[C]{\hwtitle}
+\fancyhead[L]{\hwcourse}
+\fancyfoot[C]{Page \thepage\ of \pageref{LastPage}}
+
+% Section formatting
+\newcommand{\sectionheader}[1]{\section*{#1}\addcontentsline{toc}{section}{#1}}
+
+% Homework problem environment
+\newcommand{\question}[1]{\section*{#1}}
+\newcommand{\qquestion}[1]{\subsection*{#1}}
+\newcommand{\qqquestion}[1]{\subsubsection*{#1}}
+
+% Answer box (optional)
+\newcommand{\answer}[1]{
+  \begin{tcolorbox}[breakable, enhanced, sharp corners, colback=white, colframe=\hwanswerborder]% [, title=Answer]
+    #1
+  \end{tcolorbox}
+}
